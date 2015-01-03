@@ -15,7 +15,9 @@ Stage
 
 A Stage is simply a class which implements the StageInterface. It defines a **name**, a **template name** and any
 **template parameters** that stage will require. A stage must also define whether it is **necessary** by possibly
-completing some logic and returning a boolean.
+completing some logic and returning a boolean. Stages marked as NOT **necessary** will be skipped following their
+instantiation and processing of the `isNecessary()` method, allowing that stage to complete tasks as needed before
+proceeding. Stages are skipped when the Wizard calls the `getCurrentStage()` method.
 
 Stages may optionally implement:
  - `InjectContainerInterface` if the Stage requires the Symfony container
