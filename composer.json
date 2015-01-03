@@ -12,7 +12,7 @@
         }
     ],
     "autoload": {
-        "psr-4": { "Zikula\\Component\\Wizard": "" }
+        "psr-4": { "Zikula\\Component\\Wizard\\": "" }
     },
     "require": {
         "php": ">=5.3.2",
