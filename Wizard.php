@@ -72,7 +72,8 @@ class Wizard
             $this->YamlFileLoader = new YamlFileLoader(new FileLocator($pathInfo['dirname']));
         }
         $this->YamlFileLoader->load($pathInfo['basename']);
-        $stages = $this->YamlFileLoader->getContent()['stages'];
+        $stages = $this->YamlFileLoader->getContent();
+        $stages = $stages['stages'];
         foreach ($stages as $key => $stageArray) {
             $this->stagesByName[$key] = $stageArray['class'];
             $this->stageOrder[$stageArray['order']] = $key;
