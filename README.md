@@ -110,3 +110,5 @@ class MyController
     }
 }
 ```
+
+![Flowchart](wizard.png)
