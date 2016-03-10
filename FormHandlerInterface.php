@@ -20,9 +20,9 @@ use Symfony\Component\Form\FormInterface;
 interface FormHandlerInterface
 {
     /**
-     * Returns an instance of a Symfony Form Type
+     * Returns the FQCN of a Symfony Form Type
      *
-     * @return \Symfony\Component\Form\FormTypeInterface
+     * @return string
      */
     public function getFormType();
 
@@ -33,4 +33,10 @@ interface FormHandlerInterface
      * @return boolean
      */
     public function handleFormResult(FormInterface $form);
+
+    /**
+     * Returns an array of options applied to the Form.
+     * @return array
+     */
+    public function getFormOptions();
 }
