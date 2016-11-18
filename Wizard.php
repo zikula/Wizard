@@ -28,8 +28,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class Wizard
 {
     private $container;
-    private $stagesByName = array();
-    private $stageOrder = array();
+    private $stagesByName = [];
+    private $stageOrder = [];
     private $defaultStage;
     private $currentStageName;
     private $YamlFileLoader;
@@ -67,7 +67,7 @@ class Wizard
         if ($pathInfo['extension'] !== 'yml') {
             throw new FileLoaderLoadException('Stage definition file must include .yml extension.');
         }
-        $this->stages = array(); // empty the stages
+        $this->stages = []; // empty the stages
         if (!isset($this->YamlFileLoader)) {
             $this->YamlFileLoader = new YamlFileLoader(new FileLocator($pathInfo['dirname']));
         }
@@ -146,12 +146,14 @@ class Wizard
      */
     private function getSequentialStage($direction)
     {
-        $dir = in_array($direction, array('prev', 'next')) ? $direction : 'next';
+        $dir = in_array($direction, ['prev', 'next']) ? $direction : 'next';
         ksort($this->stageOrder);
         // forward the array pointer to the current index
-        while (current($this->stageOrder) !== $this->currentStageName && key($this->stageOrder) !== null) next($this->stageOrder);
+        while (current($this->stageOrder) !== $this->currentStageName && null !== key($this->stageOrder)) {
+            next($this->stageOrder);
+        }
         $key = $dir($this->stageOrder);
-        if ((null !== $key) && (false !== $key)) {
+        if (null !== $key && false !== $key) {
 
             return $this->getStageInstance($this->stagesByName[$key]);
         }
@@ -170,7 +172,7 @@ class Wizard
         if (!class_exists($stageClass)) {
             throw new RuntimeException('Error: Could not find requested stage class.');
         }
-        if(in_array("Zikula\\Component\\Wizard\\InjectContainerInterface", class_implements($stageClass))) {
+        if (in_array("Zikula\\Component\\Wizard\\InjectContainerInterface", class_implements($stageClass))) {
 
             return new $stageClass($this->container);
         } else {
