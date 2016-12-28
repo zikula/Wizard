@@ -99,7 +99,7 @@ class MyController
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $currentStage->handleFormResult($form);
-                $url = $this->container->get('router')->generate('index', array('stage' => $wizard->getNextStage()->getName()), true);
+                $url = $this->container->get('router')->generate('index', ['stage' => $wizard->getNextStage()->getName()], true);
 
                 return new RedirectResponse($url);
             }
