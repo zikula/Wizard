@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Copyright Zikula Foundation 2014.
  *
@@ -16,14 +19,12 @@
 namespace Zikula\Component\Wizard;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 interface WizardCompleteInterface
 {
     /**
-     * Get the Response (probably RedirectResponse) for this completed Wizard
-     *
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response;
+     * Get the Response (probably RedirectResponse) for this completed Wizard.
      */
-    public function getResponse(Request $request);
+    public function getResponse(Request $request): Response;
 }

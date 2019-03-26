@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Copyright Zikula Foundation 2014.
  *
@@ -21,8 +24,6 @@ interface InjectContainerInterface
 {
     /**
      * Require the Symfony Container on instantiation
-     *
-     * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container);
 }

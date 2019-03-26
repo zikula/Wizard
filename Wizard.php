@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Copyright Zikula Foundation 2014.
  *
@@ -16,33 +19,57 @@
 namespace Zikula\Component\Wizard;
 
 use Gedmo\Exception\RuntimeException;
+use InvalidArgumentException;
 use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class Wizard
- * @package Zikula\Component\Wizard
  */
 class Wizard
 {
+    /**
+     * @var ContainerInterface
+     */
     private $container;
+
+    /**
+     * @var array
+     */
     private $stagesByName = [];
+
+    /**
+     * @var array
+     */
     private $stageOrder = [];
+
+    /**
+     * @var string
+     */
     private $defaultStage;
+
+    /**
+     * @var string
+     */
     private $currentStageName;
-    private $YamlFileLoader;
+
+    /**
+     * @var YamlFileLoader
+     */
+    private $yamlFileLoader;
+
+    /**
+     * @var string
+     */
     private $warning = '';
 
     /**
      * Constructor.
      *
-     * @param ContainerInterface $container
-     * @param string $path including filename, e.g. my/full/path/to/my/stages.yml
      * @throws FileLoaderLoadException
      */
-    function __construct(ContainerInterface $container, $path)
+    public function __construct(ContainerInterface $container, string $path)
     {
         $this->container = $container;
         if (!empty($path)) {
@@ -55,10 +82,9 @@ class Wizard
     /**
      * Load the stage definitions from $path
      *
-     * @param string $path including filename, e.g. my/full/path/to/my/stages.yml
      * @throws FileLoaderLoadException
      */
-    public function loadStagesFromYaml($path)
+    public function loadStagesFromYaml(string $path): void
     {
         if (!file_exists($path)) {
             throw new FileLoaderLoadException('Stage definition file cannot be found.');
@@ -67,12 +93,14 @@ class Wizard
         if ($pathInfo['extension'] !== 'yml') {
             throw new FileLoaderLoadException('Stage definition file must include .yml extension.');
         }
-        $this->stages = []; // empty the stages
-        if (!isset($this->YamlFileLoader)) {
-            $this->YamlFileLoader = new YamlFileLoader(new FileLocator($pathInfo['dirname']));
+
+        // empty the stages
+        $this->stagesByName = [];
+        if (!isset($this->yamlFileLoader)) {
+            $this->yamlFileLoader = new YamlFileLoader(new FileLocator($pathInfo['dirname']));
         }
-        $this->YamlFileLoader->load($pathInfo['basename']);
-        $stages = $this->YamlFileLoader->getContent();
+        $this->yamlFileLoader->load($pathInfo['basename']);
+        $stages = $this->yamlFileLoader->getContent();
         $stages = $stages['stages'];
         foreach ($stages as $key => $stageArray) {
             $this->stagesByName[$key] = $stageArray['class'];
@@ -85,16 +113,14 @@ class Wizard
 
     /**
      * Get the stage that is the first necessary stage
-     *
-     * @param $name
-     * @return StageInterface
      */
-    public function getCurrentStage($name)
+    public function getCurrentStage(string $name): StageInterface
     {
         // compute the stageClass from Request parameter
         $stageClass = $this->getStageClassName($name);
 
         // loop each stage until finds the first that is necessary
+
         do {
             $useCurrentStage = false;
             /** @var StageInterface $currentStage */
@@ -113,38 +139,31 @@ class Wizard
             } else {
                 $currentStage = $this->getNextStage();
             }
-        } while ($useCurrentStage == false);
+        } while (false === $useCurrentStage);
 
         return $currentStage;
     }
 
     /**
      * Get an instance of the previous stage
-     *
-     * @return StageInterface
      */
-    public function getPreviousStage()
+    public function getPreviousStage(): StageInterface
     {
         return $this->getSequentialStage('prev');
     }
 
     /**
      * Get an instance of the next stage
-     *
-     * @return StageInterface
      */
-    public function getNextStage()
+    public function getNextStage(): StageInterface
     {
         return $this->getSequentialStage('next');
     }
 
     /**
-     * get either previous or next stage
-     *
-     * @param $direction (prev|next)
-     * @return StageInterface|null
+     * Get either previous or next stage
      */
-    private function getSequentialStage($direction)
+    private function getSequentialStage(string $direction): ?StageInterface
     {
         $dir = in_array($direction, ['prev', 'next']) ? $direction : 'next';
         ksort($this->stageOrder);
@@ -154,7 +173,6 @@ class Wizard
         }
         $key = $dir($this->stageOrder);
         if (null !== $key && false !== $key) {
-
             return $this->getStageInstance($this->stagesByName[$key]);
         }
 
@@ -163,61 +181,48 @@ class Wizard
 
     /**
      * Factory class to instantiate a StageClass
-     *
-     * @param $stageClass
-     * @return StageInterface
      */
-    private function getStageInstance($stageClass)
+    private function getStageInstance(string $stageClass): StageInterface
     {
         if (!class_exists($stageClass)) {
             throw new RuntimeException('Error: Could not find requested stage class.');
         }
-        if (in_array("Zikula\\Component\\Wizard\\InjectContainerInterface", class_implements($stageClass))) {
-
+        if (in_array("Zikula\\Component\\Wizard\\InjectContainerInterface", class_implements($stageClass), true)) {
             return new $stageClass($this->container);
-        } else {
-
-            return new $stageClass();
         }
+
+        return new $stageClass();
     }
 
     /**
      * Has the wizard been halted?
-     *
-     * @return bool
      */
-    public function isHalted()
+    public function isHalted(): bool
     {
-        return (!empty($this->warning));
+        return !empty($this->warning);
     }
 
     /**
-     * get any warning currently set
-     *
-     * @return string
+     * Get any warning currently set
      */
-    public function getWarning()
+    public function getWarning(): string
     {
-        return "WARNING: The Wizard was halted for the following reason. This must be corrected before you can continue. " . $this->warning;
+        return 'WARNING: The Wizard was halted for the following reason. This must be corrected before you can continue. ' . $this->warning;
     }
 
     /**
      * Match the stage and return the stage classname or default.
      *
-     * @param $name
-     * @return string
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    private function getStageClassName($name)
+    private function getStageClassName(string $name): string
     {
         if (!empty($this->stagesByName[$name])) {
-
             return $this->stagesByName[$name];
         }
         if (!empty($this->defaultStage) && !empty($this->stagesByName[$this->defaultStage])) {
-
             return $this->stagesByName[$this->defaultStage];
         }
-        throw new \InvalidArgumentException('The request stage could not be found and there is no default stage defined.');
+        throw new InvalidArgumentException('The request stage could not be found and there is no default stage defined.');
     }
 }

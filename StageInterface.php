@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Copyright Zikula Foundation 2014.
  *
@@ -19,29 +22,23 @@ interface StageInterface
 {
     /**
      * The stage name
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * The stage's full template name, e.g. 'AcmeDemoBundle:Stage:prep.html.twig'
-     * @return string
      */
-    public function getTemplateName();
+    public function getTemplateName(): string;
 
     /**
      * Logic to determine if the stage is required or can be skipped
      *
-     * @return boolean
      * @throws AbortStageException
      */
-    public function isNecessary();
+    public function isNecessary(): bool;
 
     /**
      * An array of template parameters required in the stage template
-     *
-     * @return array
      */
-    public function getTemplateParams();
+    public function getTemplateParams(): array;
 }

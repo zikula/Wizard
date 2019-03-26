@@ -1,16 +1,14 @@
 <?php
-/**
- * Copyright Zikula Foundation 2014.
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the Zikula package.
  *
- * This work is contributed to the Zikula Foundation under one or more
- * Contributor Agreements and licensed to You under the following license:
+ * Copyright Zikula Foundation - https://ziku.la/
  *
- * @license MIT.
- * @package Zikula
- * @author Craig Heydenburg
- *
- * Please see the LICENSE file distributed with this source code for further
- * information regarding copyright and licensing.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Zikula\Component\Wizard;
@@ -45,10 +43,7 @@ class YamlFileLoader extends FileLoader
         return is_string($resource) && 'yml' === pathinfo($resource, PATHINFO_EXTENSION);
     }
 
-    /**
-     * @return array|null
-     */
-    public function getContent()
+    public function getContent(): ?array
     {
         return $this->content;
     }
@@ -56,13 +51,9 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads a YAML file.
      *
-     * @param string $file
-     *
-     * @return array The file content
-     *
      * @throws InvalidArgumentException when the given file is not a local file or when it does not exist
      */
-    private function loadFile($file)
+    private function loadFile(string $file): array
     {
         if (!stream_is_local($file)) {
             throw new InvalidArgumentException(sprintf('This is not a local file "%s".', $file));
@@ -82,14 +73,12 @@ class YamlFileLoader extends FileLoader
     /**
      * Validates a YAML file.
      *
-     * @param mixed  $content
-     * @param string $file
-     *
+     * @param mixed $content
      * @return array
      *
      * @throws InvalidArgumentException When service file is not valid
      */
-    private function validate($content, $file)
+    private function validate($content, string $file): array
     {
         if (null === $content) {
             return $content;
@@ -99,10 +88,8 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(__f('The yaml file "%s" is not valid. It should contain an array. Check your YAML syntax.', $file));
         }
 
-        if (isset($content['stages'])) {
-            if (!is_array($content['stages'])) {
-                throw new InvalidArgumentException(__f('The "stages" key should contain an array in %s. Check your YAML syntax.', $file));
-            }
+        if (isset($content['stages']) && !is_array($content['stages'])) {
+            throw new InvalidArgumentException(__f('The "stages" key should contain an array in %s. Check your YAML syntax.', $file));
         }
 
         return $content;

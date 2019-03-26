@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * Copyright Zikula Foundation 2014.
  *
@@ -21,22 +24,16 @@ interface FormHandlerInterface
 {
     /**
      * Returns the FQCN of a Symfony Form Type
-     *
-     * @return string
      */
-    public function getFormType();
+    public function getFormType(): string;
 
     /**
      * Handle results of previously validated form
-     *
-     * @param FormInterface $form
-     * @return boolean
      */
-    public function handleFormResult(FormInterface $form);
+    public function handleFormResult(FormInterface $form): bool;
 
     /**
      * Returns an array of options applied to the Form.
-     * @return array
      */
-    public function getFormOptions();
+    public function getFormOptions(): array;
 }
