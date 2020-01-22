@@ -1314,16 +1314,16 @@
         },
         {
             "name": "symfony/symfony",
-            "version": "v5.0.2",
+            "version": "v5.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/symfony.git",
-                "reference": "c94e669fb16c280ad7346287d21a36f02481c54f"
+                "reference": "fe34099ef413a6ed60126e1971c929ec382370ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/symfony/zipball/c94e669fb16c280ad7346287d21a36f02481c54f",
-                "reference": "c94e669fb16c280ad7346287d21a36f02481c54f",
+                "url": "https://api.github.com/repos/symfony/symfony/zipball/fe34099ef413a6ed60126e1971c929ec382370ea",
+                "reference": "fe34099ef413a6ed60126e1971c929ec382370ea",
                 "shasum": ""
             },
             "require": {
@@ -1423,7 +1423,7 @@
                 "doctrine/collections": "~1.0",
                 "doctrine/data-fixtures": "1.0.*",
                 "doctrine/dbal": "~2.4",
-                "doctrine/doctrine-bundle": "^1.5|^2.0",
+                "doctrine/doctrine-bundle": "^2.0",
                 "doctrine/orm": "~2.4,>=2.4.5",
                 "doctrine/reflection": "~1.0",
                 "egulias/email-validator": "~1.2,>=1.2.8|~2.0",
@@ -1485,7 +1485,7 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2019-12-19T18:35:20+00:00"
+            "time": "2020-01-21T13:30:18+00:00"
         },
         {
             "name": "twig/twig",
