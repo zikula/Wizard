@@ -90,7 +90,7 @@ class Wizard
             throw new LoaderLoadException('Stage definition file cannot be found.');
         }
         $pathInfo = pathinfo($path);
-        if ($pathInfo['extension'] !== 'yml') {
+        if (!in_array($pathInfo['extension'], ['yml', 'yaml'])) {
             throw new LoaderLoadException('Stage definition file must include .yml extension.');
         }
 
