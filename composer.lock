@@ -1440,16 +1440,16 @@
         },
         {
             "name": "symfony/symfony",
-            "version": "v5.0.5",
+            "version": "v5.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/symfony.git",
-                "reference": "28a7546601e16bb40384c8f4c8fcbdda6b5ee24a"
+                "reference": "358bbaec07b61f4413f6fe6147b7e460a8fe682e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/symfony/zipball/28a7546601e16bb40384c8f4c8fcbdda6b5ee24a",
-                "reference": "28a7546601e16bb40384c8f4c8fcbdda6b5ee24a",
+                "url": "https://api.github.com/repos/symfony/symfony/zipball/358bbaec07b61f4413f6fe6147b7e460a8fe682e",
+                "reference": "358bbaec07b61f4413f6fe6147b7e460a8fe682e",
                 "shasum": ""
             },
             "require": {
@@ -1625,7 +1625,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-02-29T10:41:46+00:00"
+            "time": "2020-03-27T16:20:34+00:00"
         },
         {
             "name": "twig/twig",
