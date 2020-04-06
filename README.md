@@ -1,5 +1,4 @@
-Wizard
-======
+# Wizard
 
 The Wizard Component is a management tool for multi-stage user interaction. It utilizes several Interfaces and the
 Wizard class to create a workflow that is compatible with Symfony Forms and Twig templating. Relying on the concept of
@@ -12,20 +11,20 @@ for this purpose.
 Create a concrete class that extends the `Zikula\Component\Wizard\AbstractStageContainer`. Use autowiring and autoconfiguration
 to configure the class:
 
-    _instanceof: # only works for classes that are configured in this file
-        Zikula\Component\Wizard\StageInterface:
-            tags: ['my_special_tag']
+```yaml
+_instanceof: # only works for classes that are configured in this file
+    Zikula\Component\Wizard\StageInterface:
+        tags: ['my_special_tag']
 
-    # if this is the only instance of the interface you will use, you can use an alias
-    Zikula\Component\Wizard\StageContainerInterface: '@Acme\Bundle\MyCustomBundle\Container\FooStageContainer'
+# if this is the only instance of the interface you will use, you can use an alias
+Zikula\Component\Wizard\StageContainerInterface: '@Acme\Bundle\MyCustomBundle\Container\FooStageContainer'
 
-    Acme\Bundle\MyCustomBundle\Container\FooStageContainer:
-        arguments:
-            $stages: !tagged_iterator my_special_tag
+Acme\Bundle\MyCustomBundle\Container\FooStageContainer:
+    arguments:
+        $stages: !tagged_iterator my_special_tag
+```
 
-
-Stage
------
+## Stage
 
 A Stage is simply a class which implements the StageInterface. It defines a **name**, a **template name** and any
 **template parameters** that stage will require. A stage must also define whether it is **necessary** by possibly
@@ -43,8 +42,7 @@ The Wizard can be halted in the `isNecessary()` method by throwing an `AbortStag
 available for retrieval using `$wizard->getWarning()`.
 
 
-Stage Definition File
----------------------
+## Stage Definition File
 
 The stage definition file is a simple yaml file. The first key `stages:` is required and then each stage should be
 listed by `name` and each should have properties `class` and `order`. The `name` key must be the same as the name of the
@@ -54,7 +52,7 @@ identified with a `default` property which should be set to true. This stage wil
 argument is provided.
 
 
-###Sample stages.yml
+### Sample stages.yml
 
 ```yaml
 stages:
@@ -77,7 +75,7 @@ stages:
 ```
 
 
-###Sample Controller
+### Sample Controller
 
 ```php
 use Symfony\Component\Form\FormFactoryInterface;
