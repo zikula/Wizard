@@ -5,9 +5,23 @@ The Wizard Component is a management tool for multi-stage user interaction. It u
 Wizard class to create a workflow that is compatible with Symfony Forms and Twig templating. Relying on the concept of
 **Stages**, the developer is able to define a sequence using a `.yml` file and control that sequence in their Controller.
 
-On instantiation, the Wizard class requires the **Symfony Container** and a full path to the **stage definition file**
+On instantiation, the Wizard class requires a **StageContainer** and a full path to the **stage definition file**
 (in yaml format). The Wizard will load the stage definitions from there. The Wizard Component includes a YamlFileLoader
 for this purpose.
+
+Create a concrete class that extends the `Zikula\Component\Wizard\AbstractStageContainer`. Use autowiring and autoconfiguration
+to configure the class:
+
+    _instanceof: # only works for classes that are configured in this file
+        Zikula\Component\Wizard\StageInterface:
+            tags: ['my_special_tag']
+
+    # if this is the only instance of the interface you will use, you can use an alias
+    Zikula\Component\Wizard\StageContainerInterface: '@Acme\Bundle\MyCustomBundle\Container\FooStageContainer'
+
+    Acme\Bundle\MyCustomBundle\Container\FooStageContainer:
+        arguments:
+            $stages: !tagged_iterator my_special_tag
 
 
 Stage
@@ -19,10 +33,11 @@ completing some logic and returning a boolean. Stages marked as NOT **necessary*
 instantiation and processing of the `isNecessary()` method, allowing that stage to complete tasks as needed before
 proceeding. Stages are skipped when the Wizard calls the `getCurrentStage()` method.
 
+Use Symfony autowiring and autoconfiguring or manual Dependency Injection to add services to your stages.
+
 Stages may optionally implement:
  - `InjectContainerInterface` if the Stage requires the Symfony container
  - `FormHandlerInterface` if the Stage will be using a Symfony Form
- - `WizardCompleteInterface` to indicate the wizard is finished and wrap up any logic at the end.
 
 The Wizard can be halted in the `isNecessary()` method by throwing an `AbortStageException`. The message of which is
 available for retrieval using `$wizard->getWarning()`.
@@ -65,16 +80,37 @@ stages:
 ###Sample Controller
 
 ```php
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
 use Zikula\Component\Wizard\FormHandlerInterface;
+use Zikula\Component\Wizard\StageContainerInterface;
 use Zikula\Component\Wizard\Wizard;
 use Zikula\Component\Wizard\WizardCompleteInterface;
 
 class MyController
 {
-    private $container
+    /**
+     * @var StageContainerInterface
+     */
+    private $stageContainer;
+
+    /**
+     * @var \Twig\Environment
+     */
+    private $twig;
+
+    /**
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
 
     /**
      * define route = 'index/{stage}'
@@ -82,7 +118,7 @@ class MyController
     public function indexAction(Request $request, $stage)
     {
         // begin the wizard
-        $wizard = new Wizard($this->container, realpath(__DIR__ . '/../Resources/config/stages.yml'));
+        $wizard = new Wizard($this->stageContainer, realpath(__DIR__ . '/../Resources/config/stages.yml'));
         $currentStage = $wizard->getCurrentStage($stage);
         if ($currentStage instanceof WizardCompleteInterface) {
             return $currentStage->getResponse($request);
@@ -90,23 +126,23 @@ class MyController
         $templateParams = $currentStage->getTemplateParams();
         if ($wizard->isHalted()) {
             $request->getSession()->getFlashBag()->add('danger', $wizard->getWarning());
-            return $this->container->get('templating')->renderResponse('MyBundle::error.html.twig', $templateParams);
+            return new Response($this->twig->render('@MyCustomBundle/error.html.twig', $templateParams));
         }
 
         // handle the form
         if ($currentStage instanceof FormHandlerInterface) {
-            $form = $this->container->get('form.factory')->create($currentStage->getFormType());
+            $form = $this->formFactory->create($currentStage->getFormType());
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $currentStage->handleFormResult($form);
-                $url = $this->container->get('router')->generate('index', ['stage' => $wizard->getNextStage()->getName()], true);
+                $url = $this->router->generate('index', ['stage' => $wizard->getNextStage()->getName()], true);
 
                 return new RedirectResponse($url);
             }
             $templateParams['form'] = $form->createView();
         }
 
-        return $this->container->get('templating')->renderResponse($currentStage->getTemplateName(), $templateParams);
+        return new Response($this->twig->render($currentStage->getTemplateName(), $templateParams));
     }
 }
 ```

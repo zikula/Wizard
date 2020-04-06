@@ -21,7 +21,6 @@ namespace Zikula\Component\Wizard;
 use InvalidArgumentException;
 use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
@@ -30,9 +29,9 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 class Wizard
 {
     /**
-     * @var ContainerInterface
+     * @var StageContainerInterface
      */
-    private $container;
+    private $stageContainer;
 
     /**
      * @var array
@@ -69,9 +68,9 @@ class Wizard
      *
      * @throws LoaderLoadException
      */
-    public function __construct(ContainerInterface $container, string $path)
+    public function __construct(StageContainerInterface $stageContainer, string $path)
     {
-        $this->container = $container;
+        $this->stageContainer = $stageContainer;
         if (!empty($path)) {
             $this->loadStagesFromYaml($path);
         } else {
@@ -125,7 +124,7 @@ class Wizard
             $useCurrentStage = false;
             /** @var StageInterface $currentStage */
             if (!isset($currentStage)) {
-                $currentStage = $this->getStageInstance($stageClass);
+                $currentStage = $this->getStage($stageClass);
             }
             $this->currentStageName = $currentStage->getName();
             try {
@@ -173,25 +172,21 @@ class Wizard
         }
         $key = $dir($this->stageOrder);
         if (null !== $key && false !== $key) {
-            return $this->getStageInstance($this->stagesByName[$key]);
+            return $this->getStage($this->stagesByName[$key]);
         }
 
         return null;
     }
 
     /**
-     * Factory class to instantiate a StageClass
+     * Get stage from stageContainer
      */
-    private function getStageInstance(string $stageClass): StageInterface
+    private function getStage(string $stageClass): StageInterface
     {
-        if (!class_exists($stageClass)) {
-            throw new FileNotFoundException('Error: Could not find requested stage class.');
+        if ($this->stageContainer->has($stageClass)) {
+            return $this->stageContainer->get($stageClass);
         }
-        if (in_array("Zikula\\Component\\Wizard\\InjectContainerInterface", class_implements($stageClass), true)) {
-            return new $stageClass($this->container);
-        }
-
-        return new $stageClass();
+        throw new FileNotFoundException('Error: Could not find requested stage class.');
     }
 
     /**

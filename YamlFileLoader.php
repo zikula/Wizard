@@ -28,7 +28,7 @@ class YamlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $type = null)
+    public function load($resource, string $type = null)
     {
         $path = $this->locator->locate($resource);
 
@@ -38,7 +38,7 @@ class YamlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
         return is_string($resource) && 'yml' === pathinfo($resource, PATHINFO_EXTENSION);
     }
@@ -85,11 +85,11 @@ class YamlFileLoader extends FileLoader
         }
 
         if (!is_array($content)) {
-            throw new InvalidArgumentException(__f('The yaml file "%s" is not valid. It should contain an array. Check your YAML syntax.', $file));
+            throw new InvalidArgumentException(sprintf('The yaml file "%s" is not valid. It should contain an array. Check your YAML syntax.', $file));
         }
 
         if (isset($content['stages']) && !is_array($content['stages'])) {
-            throw new InvalidArgumentException(__f('The "stages" key should contain an array in %s. Check your YAML syntax.', $file));
+            throw new InvalidArgumentException(sprintf('The "stages" key should contain an array in %s. Check your YAML syntax.', $file));
         }
 
         return $content;
