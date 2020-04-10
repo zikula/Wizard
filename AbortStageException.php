@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 /**
- * Copyright Zikula Foundation 2014.
+ * Copyright Zikula.
  *
- * This work is contributed to the Zikula Foundation under one or more
+ * This work is contributed to the Zikula under one or more
  * Contributor Agreements and licensed to You under the following license:
  *
  * @license MIT.
