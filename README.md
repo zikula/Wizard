@@ -1,3 +1,7 @@
+# Added to monorepo
+
+Wizard has been included into the [core repository](https://github.com/zikula/core/).
+
 # Wizard
 
 The Wizard Component is a management tool for multi-stage user interaction. It utilizes several Interfaces and the
